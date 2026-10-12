@@ -5,8 +5,7 @@ import * as SplashScreen from "expo-splash-screen";
 import * as SystemUI from "expo-system-ui";
 import { useEffect } from "react";
 import { Uniwind } from "uniwind";
-// @ts-expect-error CSS is loaded by the bundler; TypeScript has no declaration for it.
-import "../globals.css";
+import "../global.css";
 
 const BACKGROUND = "#101010";
 
