@@ -7,6 +7,7 @@ import * as SystemUI from "expo-system-ui";
 import { useEffect } from "react";
 import { Uniwind } from "uniwind";
 import "../global.css";
+import { QueryProvider } from "@/providers/query-provider";
 
 const BACKGROUND = "#101010";
 
@@ -40,7 +41,8 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={navigationTheme}>
-      <Stack
+      <QueryProvider>
+        <Stack
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: BACKGROUND },
@@ -48,7 +50,8 @@ export default function RootLayout() {
       >
         <Stack.Screen name="(app)" />
         <Stack.Screen name="(auth)" />
-      </Stack>
+        </Stack>
+      </QueryProvider>
     </ThemeProvider>
   );
 }
