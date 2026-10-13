@@ -42,7 +42,7 @@ const StudySetDetailScreen = () => {
   const uploadMutation = useMutation({
     mutationFn: () => pickAndUploadPdf(studySetId),
     onSuccess: (result) => {
-      invalidate(studySetId);
+      if (result) invalidate(studySetId);
       setActionError(null);
     },
     onError: (err) => setActionError(err.message),

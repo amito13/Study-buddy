@@ -1,141 +1,159 @@
+import { processSource } from "@/lib/api-client";
+import { uploadPdfSource } from "@/lib/sources";
 import { supabase } from "@/utils/supabase";
+import * as DocumentPicker from "expo-document-picker";
 
 export async function createStudySet(title: string, description?: string) {
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not authenticated");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
 
-    const { data, error } = await supabase
-        .from("study_sets")
-        .insert({
-            user_id: user.id,
-            title: title.trim(),
-            description: description?.trim() || null,
-        })
-        .select("*")
-        .single();
+  const { data, error } = await supabase
+    .from("study_sets")
+    .insert({
+      user_id: user.id,
+      title: title.trim(),
+      description: description?.trim() || null,
+    })
+    .select("*")
+    .single();
 
-    if (error) throw error;
-    return data;
+  if (error) throw error;
+  return data;
 }
 
 // todo: pickuploadpdf
 
-export async function pickAndUploadPdf(studySetId:string){
+export async function pickAndUploadPdf(studySetId: string) {
+  console.log("pickAndUploadPdf");
+  const result = await DocumentPicker.getDocumentAsync({
+    type: "application/pdf",
+    copyToCacheDirectory: false,
+  });
 
+  if (result.canceled) return null;
+
+  const asset = result.assets[0];
+
+  return await uploadPdfSource({
+    studySetId,
+    title: studySetId?.trim() || asset.name.replace(/\.pdf$/i, ""),
+    file: {
+      uri: asset.uri,
+      name: asset.name,
+      size: asset.size,
+    },
+  });
 }
 
 export async function createNoteSource(
-    studySetId: string,
-    title: string,
-    content: string,
-  ) { 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not authenticated");
-  
-    const { data: source, error } = await supabase
-      .from("sources")
-      .insert({
-        user_id: user.id,
-        study_set_id: studySetId,
-        type: "note",
-        title: title.trim(),
-        content: content.trim(),
-        status: "processing",
-      })
-      .select("id")
-      .single();
-  
-    if (error) throw error;
-  
-    // await processSource(source.id);
-    return source.id;
+  studySetId: string,
+  title: string,
+  content: string,
+) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const { data: source, error } = await supabase
+    .from("sources")
+    .insert({
+      user_id: user.id,
+      study_set_id: studySetId,
+      type: "note",
+      title: title.trim(),
+      content: content.trim(),
+      status: "processing",
+    })
+    .select("id")
+    .single();
+
+  if (error) throw error;
+
+  await processSource(source.id);
+  return source.id;
+}
+
+export async function createWebSource(
+  studySetId: string,
+  url: string,
+  title?: string,
+) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const trimmed = url.trim();
+  const normalized = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(normalized);
+  } catch {
+    throw new Error("Enter a valid URL");
   }
-  
 
-  export async function createWebSource(
-    studySetId: string,
-    url: string,
-    title?: string,
-  ) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not authenticated");
-  
-    const trimmed = url.trim();
-    const normalized = /^https?:\/\//i.test(trimmed)
-      ? trimmed
-      : `https://${trimmed}`;
-  
-    let parsed: URL;
-    try {
-      parsed = new URL(normalized);
-    } catch {
-      throw new Error("Enter a valid URL");
-    }
-  
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-      throw new Error("URL must start with http:// or https://");
-    }
-  
-    const sourceTitle =
-      title?.trim() || parsed.hostname.replace(/^www\./, "") || "Web page";
-  
-    const { data: source, error } = await supabase
-      .from("sources")
-      .insert({
-        user_id: user.id,
-        study_set_id: studySetId,
-        type: "web",
-        title: sourceTitle,
-        url: parsed.toString(),
-        status: "processing",
-      })
-      .select("id")
-      .single();
-  
-    if (error) throw error;
-  
-    // await processSource(source.id);
-    return source.id;
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("URL must start with http:// or https://");
   }
-  
 
-  export async function createConversation(studySetId: string, title?: string) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not authenticated");
-  
-    const { data, error } = await supabase
-      .from("conversations")
-      .insert({
-        user_id: user.id,
-        study_set_id: studySetId,
-        title: title?.trim() || "Study chat",
-      })
-      .select("*")
-      .single();
-  
-    if (error) throw error;
-    return data;
-  }
-  
+  const sourceTitle =
+    title?.trim() || parsed.hostname.replace(/^www\./, "") || "Web page";
 
-  export async function retryProcessSource(sourceId: string) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not authenticated");
+  const { data: source, error } = await supabase
+    .from("sources")
+    .insert({
+      user_id: user.id,
+      study_set_id: studySetId,
+      type: "web",
+      title: sourceTitle,
+      url: parsed.toString(),
+      status: "processing",
+    })
+    .select("id")
+    .single();
 
-    const { error } = await supabase
-      .from("sources")
-      .update({ status: "processing" })
-      .eq("id", sourceId);
+  if (error) throw error;
 
-    if (error) throw error;
-  }
+  await processSource(source.id);
+  return source.id;
+}
+
+export async function createConversation(studySetId: string, title?: string) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const { data, error } = await supabase
+    .from("conversations")
+    .insert({
+      user_id: user.id,
+      study_set_id: studySetId,
+      title: title?.trim() || "Study chat",
+    })
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function retryProcessSource(sourceId: string) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const { error } = await supabase
+    .from("sources")
+    .update({ status: "processing" })
+    .eq("id", sourceId);
+
+  if (error) throw error;
+}
