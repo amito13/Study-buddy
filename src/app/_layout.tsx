@@ -1,3 +1,4 @@
+ import { initAuth, useAuthStore } from "@/features/auth/auth";
 import { navigationTheme } from "@/lib/theme";
 import { ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
@@ -10,7 +11,6 @@ import "../global.css";
 const BACKGROUND = "#101010";
 
 SplashScreen.preventAutoHideAsync();
-
 Uniwind.setTheme("dark");
 
 export const unstable_settings = {
@@ -18,13 +18,25 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  const initialized = useAuthStore((state) => state.initialized);
+
   useEffect(() => {
     SystemUI.setBackgroundColorAsync(BACKGROUND);
   }, []);
 
   useEffect(() => {
-    SplashScreen.hideAsync();
+    return initAuth();
   }, []);
+
+  useEffect(() => {
+    if (initialized) {
+      SplashScreen.hideAsync();
+    }
+  }, [initialized]);
+
+  if (!initialized) {
+    return null;
+  }
 
   return (
     <ThemeProvider value={navigationTheme}>
