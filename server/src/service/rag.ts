@@ -1,53 +1,45 @@
-import { embed } from "ai";
-
-import { embeddingModel } from "../lib/ai";
 import { supabaseAdmin } from "../lib/supabase";
-
+import { rankPassages, searchTerms } from "../lib/text-search";
 
 export type MatchedChunk = { id: string; content: string; similarity: number };
 
+async function readySourceIds(studySetId: string): Promise<string[]> {
+  const { data, error } = await supabaseAdmin.from("sources").select("id")
+    .eq("study_set_id", studySetId).eq("status", "ready");
+  if (error) throw new Error(`Failed to load sources: ${error.message}`);
+  return (data ?? []).map(source => source.id);
+}
 
-export async function retrieveContext(
-    studySetId: string,
-    query: string,
-    matchCount = 8,
-  ): Promise<MatchedChunk[]> {
-    const { embedding } = await embed({ model: embeddingModel, value: query });
-  
-    const { data, error } = await supabaseAdmin.rpc("match_source_chunks", {
-      query_embedding: JSON.stringify(embedding),
-      match_study_set_id: studySetId,
-      match_count: matchCount,
-    });
-  
-    if (error) throw new Error(`Vector search failed: ${error.message}`);
-    return (data as MatchedChunk[] | null) ?? [];
+// Keyword retrieval runs in Supabase and needs no embedding service or migration.
+// Callers verify ownership of the study set/conversation before retrieving context.
+export async function retrieveContext(studySetId: string, query: string, matchCount = 8): Promise<MatchedChunk[]> {
+  const sourceIds = await readySourceIds(studySetId);
+  if (!sourceIds.length) return [];
+  const terms = searchTerms(query);
+  let request = supabaseAdmin.from("source_chunks").select("id, content")
+    .in("source_id", sourceIds).order("source_id").order("chunk_index").limit(128);
+  if (terms.length) request = request.or(terms.map(term => `content.ilike.%${term}%`).join(","));
+  const { data, error } = await request;
+  if (error) throw new Error(`Text search failed: ${error.message}`);
+  if (data?.length) return rankPassages(data, terms, matchCount);
+
+  // Broad questions or wording with no hits receive introductory source passages.
+  const fallback = await supabaseAdmin.from("source_chunks").select("id, content")
+    .in("source_id", sourceIds).order("chunk_index").order("id").limit(matchCount);
+  if (fallback.error) throw new Error(`Failed to load context: ${fallback.error.message}`);
+  return rankPassages(fallback.data ?? [], [], matchCount);
+}
+
+export async function getStudySetText(studySetId: string, maxChars = 24000): Promise<string> {
+  const sourceIds = await readySourceIds(studySetId);
+  if (!sourceIds.length) return "";
+  const { data, error } = await supabaseAdmin.from("source_chunks").select("content, chunk_index")
+    .in("source_id", sourceIds).order("chunk_index").order("id");
+  if (error) throw new Error(`Failed to load study material: ${error.message}`);
+  let text = "";
+  for (const chunk of data ?? []) {
+    if (text.length + chunk.content.length + 2 > maxChars) break;
+    text += chunk.content + "\n\n";
   }
-  
-  export async function getStudySetText(
-    studySetId: string,
-    maxChars = 24000,
-  ): Promise<string> {
-    const { data: sources } = await supabaseAdmin
-      .from("sources")
-      .select("id")
-      .eq("study_set_id", studySetId)
-      .eq("status", "ready");
-  
-    const sourceIds = (sources ?? []).map((s) => s.id);
-    if (sourceIds.length === 0) return "";
-  
-    const { data: chunks } = await supabaseAdmin
-      .from("source_chunks")
-      .select("content, chunk_index")
-      .in("source_id", sourceIds)
-      .order("chunk_index", { ascending: true });
-  
-    let text = "";
-    for (const chunk of chunks ?? []) {
-      if (text.length + chunk.content.length > maxChars) break;
-      text += chunk.content + "\n\n";
-    }
-    return text.trim();
-  }
-  
+  return text.trim();
+}

@@ -1,13 +1,7 @@
-import {createAnthropic} from '@ai-sdk/anthropic';
-
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { env } from "../env";
 
-const anthropicai = createAnthropic({
-    apiKey: env.anthropicApiKey,
-});
+const anthropic = createAnthropic({ apiKey: env.anthropicApiKey });
 
-export const chatModel = anthropicai.chat(env.chatModel)
-export const embeddingModel = anthropicai.embeddingModel(env.embeddingModel);
-
-export const chatModelId = env.chatModel
-export const embeddingModelId = env.embeddingModel;
+export const chatModel = anthropic.chat(env.chatModel);
+export const chatModelId = env.chatModel;

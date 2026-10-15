@@ -1,5 +1,3 @@
-import { embedMany } from "ai";
-import { embeddingModel } from "../lib/ai";
 import { supabaseAdmin } from "../lib/supabase";
 import { extractPdfText } from "./pdf";
 import { fetchWebText } from "../service/web";
@@ -90,19 +88,14 @@ export async function ingestSource(
             });
         }
 
-        const { embeddings } = await embedMany({
-            model: embeddingModel,
-            values: chunks,
-        });
-
         // Replace any prior chunks so reprocessing is idempotent.
-        await supabaseAdmin.from("source_chunks").delete().eq("source_id", sourceId);
+        const { error: deleteError } = await supabaseAdmin.from("source_chunks").delete().eq("source_id", sourceId);
+        if (deleteError) throw new Error(deleteError.message);
 
         const rows = chunks.map((content, index) => ({
             source_id: sourceId,
             chunk_index: index,
             content,
-            embedding: JSON.stringify(embeddings[index]),
             token_count: Math.ceil(content.length / 4),
         }));
 
@@ -111,19 +104,15 @@ export async function ingestSource(
             .insert(rows);
         if (insertError) throw new Error(insertError.message);
 
-        await supabaseAdmin
+        const { error: readyError } = await supabaseAdmin
             .from("sources")
             .update({ status: "ready", error_message: null })
             .eq("id", sourceId);
+        if (readyError) throw new Error(readyError.message);
 
         return { chunkCount: chunks.length };
     } catch (err) {
-        if (!(err instanceof Error) || !("status" in err)) {
-            await markFailed(
-                sourceId,
-                err instanceof Error ? err.message : "Processing failed",
-            );
-        }
+        await markFailed(sourceId, err instanceof Error ? err.message : "Processing failed");
         throw err;
     }
 }

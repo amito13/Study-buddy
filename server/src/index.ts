@@ -1,16 +1,4 @@
-import cors from "cors";
-import express from "express";
+import { app } from "./app";
 import { env } from "./env";
-const app = express();
 
-app.use(cors({ origin: true }));
-app.use(express.json({ limit: "10mb" }));
-
-app.get("/health", (_req, res) => {
-    res.json({ status: "ok" });
-});
-
-
-app.listen(env.port, () => {
-    console.log(`Server is running on port ${env.port}`);
-});
+app.listen(env.port, "0.0.0.0", () => console.log(`Server is running on port ${env.port}`));

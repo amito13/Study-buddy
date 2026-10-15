@@ -7,19 +7,23 @@ import {
   View,
 } from "react-native";
 
+import { QueryFeedback } from "@/components/study-ui";
 import { signOut, useAuthStore } from "@/features/auth/auth";
 
 
 export default function SettingsScreen() {
   const email = useAuthStore((state) => state.session?.user.email);
   const [loading, setLoading] = useState(false);
-  const [restoreMessage, setRestoreMessage] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
  
 
   async function handleSignOut() {
     setLoading(true);
+    setError(null);
     try {
       await signOut();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause : new Error("Unable to sign out. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -33,6 +37,8 @@ export default function SettingsScreen() {
       contentContainerClassName="gap-4 p-6"
       contentInsetAdjustmentBehavior="automatic"
     >
+      <Text className="text-2xl font-bold text-foreground">Your study space</Text>
+      <Text className="text-base text-muted">Manage your account and keep learning at your pace.</Text>
       <View className="gap-2 rounded-2xl border border-border bg-card p-5">
         <Text className="text-sm text-muted">Signed in as</Text>
         <Text selectable className="text-base text-foreground">
@@ -44,6 +50,8 @@ export default function SettingsScreen() {
 
 
 
+      <View className="gap-2 rounded-2xl border border-border bg-card p-5"><Text className="font-semibold text-foreground">About Study Buddy</Text><Text className="text-sm leading-6 text-muted">Your materials, made easier to understand. Build study sets, explore summaries, practice flashcards, and ask questions grounded in your notes.</Text></View>
+      <QueryFeedback error={error} />
       <Pressable
         disabled={loading}
         onPress={handleSignOut}

@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 
+import { QueryFeedback } from "@/components/study-ui";
 import { EmptyState } from "@/components/empty-state";
 import { StudySetCard } from "@/components/study-set-card";
 import { createStudySet } from "@/features/study-sets/actions";
@@ -37,6 +38,7 @@ export default function LibraryScreen() {
   const listHeader = (
     <View className="gap-4 pb-4">
       <View className="gap-2">
+        <Text className="text-3xl font-bold text-foreground">A space for your next breakthrough.</Text>
         <Text className="text-sm text-muted">Your study collections</Text>
         <Text className="text-base text-foreground">
           Upload materials, generate summaries, flashcards, and chat with your notes.
@@ -108,7 +110,8 @@ export default function LibraryScreen() {
       refreshing={isRefetching}
       onRefresh={refetch}
       ListHeaderComponent={listHeader}
-      ListEmptyComponent={
+      keyboardShouldPersistTaps="handled"
+      ListEmptyComponent={isLoading || error ? <QueryFeedback loading={isLoading} error={error} onRetry={() => { void refetch(); }} /> :
         <EmptyState
           title="No study sets yet"
           description="Create your first study set, then add a PDF or note to get started."

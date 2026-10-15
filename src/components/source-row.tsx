@@ -39,6 +39,7 @@ export function SourceRow({
             {source.error_message}
           </Text>
         ) : null}
+        {retryMutation.error ? <Text selectable className="text-xs text-danger">{retryMutation.error.message}</Text> : null}
         {source.status === "failed" ? (
           <Pressable
             disabled={retryMutation.isPending}

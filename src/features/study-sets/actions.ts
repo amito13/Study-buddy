@@ -23,10 +23,7 @@ export async function createStudySet(title: string, description?: string) {
   return data;
 }
 
-// todo: pickuploadpdf
-
 export async function pickAndUploadPdf(studySetId: string) {
-  console.log("pickAndUploadPdf");
   const result = await DocumentPicker.getDocumentAsync({
     type: "application/pdf",
     copyToCacheDirectory: false,
@@ -38,7 +35,7 @@ export async function pickAndUploadPdf(studySetId: string) {
 
   return await uploadPdfSource({
     studySetId,
-    title: studySetId?.trim() || asset.name.replace(/\.pdf$/i, ""),
+    title: asset.name.replace(/\.pdf$/i, ""),
     file: {
       uri: asset.uri,
       name: asset.name,
@@ -72,7 +69,7 @@ export async function createNoteSource(
 
   if (error) throw error;
 
-  await processSource(source.id);
+  await processSourceWithStatus(source.id);
   return source.id;
 }
 
@@ -120,7 +117,7 @@ export async function createWebSource(
 
   if (error) throw error;
 
-  await processSource(source.id);
+  await processSourceWithStatus(source.id);
   return source.id;
 }
 
@@ -152,8 +149,21 @@ export async function retryProcessSource(sourceId: string) {
 
   const { error } = await supabase
     .from("sources")
-    .update({ status: "processing" })
+    .update({ status: "processing", error_message: null })
     .eq("id", sourceId);
 
   if (error) throw error;
+  await processSourceWithStatus(sourceId);
+}
+
+async function processSourceWithStatus(sourceId: string) {
+  try {
+    await processSource(sourceId);
+  } catch (error) {
+    await supabase.from("sources").update({
+      status: "failed",
+      error_message: error instanceof Error ? error.message : "Processing failed. Please try again.",
+    }).eq("id", sourceId);
+    throw error;
+  }
 }

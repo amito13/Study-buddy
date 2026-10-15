@@ -15,7 +15,9 @@ async function apiPost<T>(path: string, body: unknown = {}): Promise<T> {
 
   if (!token) throw new Error("Not authenticated");
 
-  const res = await fetch(`${API_URL}${path}`, {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL.replace(/\/+$/, "")}${path}`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -24,11 +26,26 @@ async function apiPost<T>(path: string, body: unknown = {}): Promise<T> {
       "X-Access-Token": token,
     },
     body: JSON.stringify(body),
-  });
+    });
+  } catch {
+    const address = new URL(API_URL).origin;
+    throw new Error(`Cannot reach the study server at ${address}. Check that the backend is running and your phone can reach this address.`);
+  }
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `Request failed (${res.status})`);
+    const body = await res.text();
+    let message = res.status === 404
+      ? "API endpoint not found. Check the API URL and restart the backend."
+      : `Request failed (${res.status}). Please try again.`;
+    try {
+      const parsed: unknown = JSON.parse(body);
+      if (parsed && typeof parsed === "object" && "error" in parsed && typeof parsed.error === "string") {
+        message = parsed.error;
+      }
+    } catch {
+      // Proxies and missing routes may return HTML instead of an API error.
+    }
+    throw new Error(message);
   }
 
   return res.json();

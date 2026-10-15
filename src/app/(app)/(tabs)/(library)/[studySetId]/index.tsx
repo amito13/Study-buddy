@@ -1,3 +1,4 @@
+import { QueryFeedback } from "@/components/study-ui";
 import { EmptyState } from "@/components/empty-state";
 import { SourceRow } from "@/components/source-row";
 import {
@@ -27,8 +28,8 @@ import {
 const StudySetDetailScreen = () => {
     const { studySetId } = useLocalSearchParams<{ studySetId: string }>();
   const invalidate = useInvalidateStudySet();
-  const { data: studySet, isLoading } = useStudySet(studySetId);
-  const { data: sources } = useSources(studySetId);
+  const { data: studySet, isLoading, error, refetch } = useStudySet(studySetId);
+  const { data: sources, isLoading: sourcesLoading, error: sourcesError, refetch: refetchSources } = useSources(studySetId);
   const [noteTitle, setNoteTitle] = useState("");
   const [noteContent, setNoteContent] = useState("");
   const [webUrl, setWebUrl] = useState("");
@@ -45,7 +46,7 @@ const StudySetDetailScreen = () => {
       if (result) invalidate(studySetId);
       setActionError(null);
     },
-    onError: (err) => setActionError(err.message),
+    onError: (err) => { setActionError(err.message); invalidate(studySetId); },
   });
 
   
@@ -58,7 +59,7 @@ const StudySetDetailScreen = () => {
       setSourceForm(null);
       setActionError(null);
     },
-    onError: (err) => setActionError(err.message),
+    onError: (err) => { setActionError(err.message); invalidate(studySetId); },
   });
 
   const webMutation = useMutation({
@@ -70,17 +71,19 @@ const StudySetDetailScreen = () => {
       setSourceForm(null);
       setActionError(null);
     },
-    onError: (err) => setActionError(err.message),
+    onError: (err) => { setActionError(err.message); invalidate(studySetId); },
   });
 
   
-  if (isLoading || !studySet) {
+  if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
         <ActivityIndicator color="#ffc799" />
       </View>
     );
   }
+
+  if (!studySet) return <View className="flex-1 bg-background p-6"><QueryFeedback error={error || new Error("Study set not found")} onRetry={() => { void refetch(); }} /></View>;
 
   const basePath = `/(app)/(tabs)/(library)/${studySetId}` as const;
   return (
@@ -90,6 +93,7 @@ const StudySetDetailScreen = () => {
         className="flex-1 bg-background"
         contentContainerClassName="gap-6 p-6"
         contentInsetAdjustmentBehavior="automatic"
+        keyboardShouldPersistTaps="handled"
       >
         {studySet.description ? (
           <Text className="text-base text-muted">{studySet.description}</Text>
@@ -115,12 +119,13 @@ const StudySetDetailScreen = () => {
               asChild
               disabled={!hasReadySources}
             >
-            
+              <Pressable disabled={!hasReadySources} className="rounded-xl bg-primary px-4 py-3 disabled:opacity-40"><Text className="font-medium text-primary-foreground">Flashcards</Text></Pressable>
             </Link>
+            <Link href={`${basePath}/chat` as Href} asChild disabled={!hasReadySources}><Pressable disabled={!hasReadySources} className="rounded-xl bg-primary px-4 py-3 disabled:opacity-40"><Text className="font-medium text-primary-foreground">Study chat</Text></Pressable></Link>
         
              
           </View>
-          
+          <Text className="text-sm text-muted">{hasReadySources ? `${readyCount} processed sources ready to study` : "Add and process a source to unlock your study tools."}</Text>
         </View>
 
         <View className="gap-3">
@@ -233,7 +238,8 @@ const StudySetDetailScreen = () => {
             </Text>
           ) : null}
 
-          {sources && sources.length > 0 ? (
+          <QueryFeedback loading={sourcesLoading} error={sourcesError} onRetry={() => { void refetchSources(); }} />
+          {sourcesLoading || sourcesError ? null : sources && sources.length > 0 ? (
             <View className="gap-2">
               {sources.map((source) => (
                 <SourceRow
