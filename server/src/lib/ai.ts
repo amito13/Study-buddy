@@ -6,7 +6,8 @@ const anthropicai = createAnthropic({
     apiKey: env.anthropicApiKey,
 });
 
-export const chatmodel = anthropicai.chat(env.chatModel)
+export const chatModel = anthropicai.chat(env.chatModel)
 export const embeddingModel = anthropicai.embeddingModel(env.embeddingModel);
 
 export const chatModelId = env.chatModel
+export const embeddingModelId = env.embeddingModel;
