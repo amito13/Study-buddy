@@ -24,4 +24,5 @@ export const env = {
   /** Secret key (sk_...) for server-side entitlement checks. Optional in local dev. */
   revenueCatSecretApiKey: process.env.REVENUECAT_SECRET_API_KEY?.trim() || "",
   firecrawlApiKey: required("FIRECRAWL_API_KEY"),
+  embeddingModel: process.env.ANTHROPIC_EMBEDDING_MODEL ?? "text-embedding-3-small"
 } as const;
