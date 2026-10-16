@@ -1,3 +1,4 @@
+import { ScreenHeading } from "@/components/screen-heading";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -34,11 +35,10 @@ export default function SettingsScreen() {
   return (
     <ScrollView
       className="flex-1 bg-background"
-      contentContainerClassName="gap-4 p-6"
+      contentContainerClassName="gap-5 px-5 py-6 pb-12"
       contentInsetAdjustmentBehavior="automatic"
     >
-      <Text className="text-2xl font-bold text-foreground">Your study space</Text>
-      <Text className="text-base text-muted">Manage your account and keep learning at your pace.</Text>
+      <ScreenHeading eyebrow="ACCOUNT" title="Your study space." description="A little space to make learning your own." />
       <View className="gap-2 rounded-2xl border border-border bg-card p-5">
         <Text className="text-sm text-muted">Signed in as</Text>
         <Text selectable className="text-base text-foreground">
@@ -55,10 +55,10 @@ export default function SettingsScreen() {
       <Pressable
         disabled={loading}
         onPress={handleSignOut}
-        className="items-center rounded-xl border border-border bg-card px-4 py-3"
+        className="items-center rounded-2xl border border-border bg-card px-4 py-3"
       >
         {loading ? (
-          <ActivityIndicator color="#ffc799" />
+          <ActivityIndicator color="#E1DCC9" />
         ) : (
           <Text className="text-base font-medium text-primary">Sign out</Text>
         )}

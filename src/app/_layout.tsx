@@ -9,7 +9,7 @@ import { Uniwind } from "uniwind";
 import "../global.css";
 import { QueryProvider } from "@/providers/query-provider";
 
-const BACKGROUND = "#101010";
+const BACKGROUND = "#000000";
 
 SplashScreen.preventAutoHideAsync();
 Uniwind.setTheme("dark");

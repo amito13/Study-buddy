@@ -26,7 +26,7 @@ export function SourceRow({
   });
 
   return (
-    <View className="flex-row items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3">
+    <View className="flex-row items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3">
       <View className="min-w-0 flex-1 gap-1">
         <Text className="text-base font-medium text-foreground" numberOfLines={1}>
           {source.title}
@@ -47,7 +47,7 @@ export function SourceRow({
             className="mt-1 self-start rounded-lg border border-border px-3 py-1.5 disabled:opacity-50"
           >
             {retryMutation.isPending ? (
-              <ActivityIndicator color="#ffc799" size="small" />
+              <ActivityIndicator color="#E1DCC9" size="small" />
             ) : (
               <Text className="text-xs font-medium text-foreground">Retry</Text>
             )}

@@ -1,3 +1,4 @@
+import { ScreenHeading } from "@/components/screen-heading";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
@@ -37,31 +38,29 @@ export default function LibraryScreen() {
 
   const listHeader = (
     <View className="gap-4 pb-4">
-      <View className="gap-2">
-        <Text className="text-3xl font-bold text-foreground">A space for your next breakthrough.</Text>
-        <Text className="text-sm text-muted">Your study collections</Text>
-        <Text className="text-base text-foreground">
-          Upload materials, generate summaries, flashcards, and chat with your notes.
-        </Text>
+      <ScreenHeading eyebrow="YOUR PERSONAL STUDY SPACE" title={"Small steps.\nBig breakthroughs."} description="Gather your materials. Find the key ideas. Make what you learn stay with you." />
+      <View className="flex-row items-center justify-between pt-3">
+        <Text className="text-xl font-semibold text-foreground">Your collections</Text>
+        <Text className="text-sm text-muted">{studySets?.length ?? 0} study sets</Text>
       </View>
 
       {showForm ? (
-        <View className="gap-3 rounded-2xl border border-border bg-card p-4">
-          <Text className="text-base font-medium text-foreground">New study set</Text>
+        <View className="gap-3 rounded-3xl border border-border bg-card p-5">
+          <Text className="text-base font-medium text-foreground">＋  New study set</Text>
           <TextInput
             placeholder="Title"
-            placeholderTextColor="#71717a"
+            placeholderTextColor="#B3A58E"
             value={title}
             onChangeText={setTitle}
-            className="rounded-xl border border-border bg-input px-4 py-3 text-foreground"
+            className="rounded-2xl border border-border bg-input px-4 py-4 text-foreground"
           />
           <TextInput
             placeholder="Description (optional)"
-            placeholderTextColor="#71717a"
+            placeholderTextColor="#B3A58E"
             value={description}
             onChangeText={setDescription}
             multiline
-            className="min-h-20 rounded-xl border border-border bg-input px-4 py-3 text-foreground"
+            className="min-h-20 rounded-2xl border border-border bg-input px-4 py-4 text-foreground"
           />
           {createMutation.error ? (
             <Text selectable className="text-sm text-danger">
@@ -72,17 +71,17 @@ export default function LibraryScreen() {
             <Pressable
               disabled={!title.trim() || createMutation.isPending}
               onPress={() => createMutation.mutate()}
-              className="flex-1 items-center rounded-xl bg-primary px-4 py-3 disabled:opacity-50"
+              className="flex-1 items-center rounded-2xl bg-primary px-5 py-4 disabled:opacity-50"
             >
               {createMutation.isPending ? (
-                <ActivityIndicator color="#101010" />
+                <ActivityIndicator color="#000000" />
               ) : (
                 <Text className="font-semibold text-primary-foreground">Create</Text>
               )}
             </Pressable>
             <Pressable
               onPress={() => setShowForm(false)}
-              className="items-center rounded-xl border border-border px-4 py-3"
+              className="items-center rounded-2xl border border-border px-4 py-3"
             >
               <Text className="text-foreground">Cancel</Text>
             </Pressable>
@@ -91,9 +90,9 @@ export default function LibraryScreen() {
       ) : (
         <Pressable
           onPress={() => setShowForm(true)}
-          className="items-center rounded-xl bg-primary px-4 py-3"
+          className="items-center rounded-2xl bg-primary px-5 py-4"
         >
-          <Text className="font-semibold text-primary-foreground">New study set</Text>
+          <Text className="font-semibold text-primary-foreground">＋  New study set</Text>
         </Pressable>
       )}
     </View>
@@ -105,7 +104,7 @@ export default function LibraryScreen() {
       className="flex-1 bg-background"
       data={studySets ?? []}
       keyExtractor={(item) => item.id}
-      contentContainerClassName="gap-3 p-6"
+      contentContainerClassName="gap-4 px-5 py-6 pb-12"
       contentInsetAdjustmentBehavior="automatic"
       refreshing={isRefetching}
       onRefresh={refetch}

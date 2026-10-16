@@ -1,15 +1,15 @@
 import { DarkTheme, type Theme } from "@react-navigation/native";
 
 export const colors = {
-  background: "#101010",
-  foreground: "#ffffff",
-  muted: "#a0a0a0",
-  border: "#27272a",
-  card: "#18181b",
-  primary: "#ffc799",
-  primaryForeground: "#101010",
-  input: "#27272a",
-  danger: "#ff8080",
+  background: "#000000",
+  foreground: "#E1DCC9",
+  muted: "#B3A58E",
+  border: "#412D15",
+  card: "#1F150C",
+  primary: "#E1DCC9",
+  primaryForeground: "#000000",
+  input: "#1F150C",
+  danger: "#ffaaaa",
 } as const;
 
 export const navigationTheme: Theme = {

@@ -1,3 +1,4 @@
+import { ScreenHeading } from "@/components/screen-heading";
 import type { Session } from "@supabase/supabase-js";
 import { Link, type Href } from "expo-router";
 import { useState } from "react";
@@ -16,7 +17,7 @@ import { create } from "zustand";
 
 import { supabase } from "@/utils/supabase";
 
-const BACKGROUND = "#101010";
+const BACKGROUND = "#000000";
 
 type AuthState = {
 
@@ -136,14 +137,11 @@ export function AuthScreen({ mode }: AuthScreenProps) {
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior="automatic"
       >
-        {/* Header */}
-        <View className="gap-2">
-          <Text className="text-3xl font-semibold text-foreground">AI Study Buddy</Text>
-          <Text className="text-base text-muted">{subtitle}</Text>
-        </View>
-  
+        <ScreenHeading eyebrow="STUDY BUDDY" title={isLogin ? "Welcome back.\nFind your focus." : "A fresh start.\nA clearer mind."} description="Your notes, connected. Your ideas, understood. A calmer way to learn." />
+        <Text className="text-xl font-semibold text-foreground">{subtitle}</Text>
+
         {/* Email + password + submit */}
-        <View className="gap-4">
+        <View className="gap-5 rounded-3xl border border-border bg-card p-5">
           <View className="gap-2">
             <Text className="text-sm text-muted">Email</Text>
             <TextInput
@@ -151,10 +149,10 @@ export function AuthScreen({ mode }: AuthScreenProps) {
               autoComplete="email"
               keyboardType="email-address"
               placeholder="you@example.com"
-              placeholderTextColor="#7e7e7e"
+              placeholderTextColor="#B3A58E"
               value={email}
               onChangeText={setEmail}
-              className="rounded-xl border border-border bg-input px-4 py-3 text-foreground"
+              className="rounded-2xl border border-border bg-input px-4 py-4 text-foreground"
             />
           </View>
   
@@ -165,10 +163,10 @@ export function AuthScreen({ mode }: AuthScreenProps) {
               autoComplete={passwordAutoComplete}
               secureTextEntry
               placeholder="••••••••"
-              placeholderTextColor="#7e7e7e"
+              placeholderTextColor="#B3A58E"
               value={password}
               onChangeText={setPassword}
-              className="rounded-xl border border-border bg-input px-4 py-3 text-foreground"
+              className="rounded-2xl border border-border bg-input px-4 py-4 text-foreground"
             />
           </View>
   
@@ -181,10 +179,10 @@ export function AuthScreen({ mode }: AuthScreenProps) {
           <Pressable
             disabled={loading}
             onPress={handleSubmit}
-            className="items-center rounded-xl bg-primary px-4 py-3"
+            className="items-center rounded-2xl bg-primary px-5 py-4"
           >
             {loading ? (
-              <ActivityIndicator color="#101010" />
+              <ActivityIndicator color="#000000" />
             ) : (
               <Text className="text-base font-semibold text-primary-foreground">
                 {submitLabel}

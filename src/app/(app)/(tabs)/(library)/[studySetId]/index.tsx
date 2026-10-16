@@ -1,3 +1,4 @@
+import { ScreenHeading } from "@/components/screen-heading";
 import { QueryFeedback } from "@/components/study-ui";
 import { EmptyState } from "@/components/empty-state";
 import { SourceRow } from "@/components/source-row";
@@ -78,7 +79,7 @@ const StudySetDetailScreen = () => {
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator color="#ffc799" />
+        <ActivityIndicator color="#E1DCC9" />
       </View>
     );
   }
@@ -95,12 +96,10 @@ const StudySetDetailScreen = () => {
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
       >
-        {studySet.description ? (
-          <Text className="text-base text-muted">{studySet.description}</Text>
-        ) : null}
+        <ScreenHeading eyebrow="YOUR COLLECTION" title={studySet.title} description={studySet.description || "A home for your sources, ideas, and next breakthrough."} />
 
         <View className="gap-3">
-          <Text className="text-lg font-semibold text-foreground">AI tools</Text>
+          <Text className="text-lg font-semibold text-foreground">Choose your study mode</Text>
           <View className="flex-row flex-wrap gap-2">
             <Link
               href={`${basePath}/summary` as Href}
@@ -109,9 +108,9 @@ const StudySetDetailScreen = () => {
             >
               <Pressable
                 disabled={!hasReadySources}
-                className="rounded-xl bg-primary px-4 py-3 disabled:opacity-40"
+                className="min-h-20 grow justify-center rounded-2xl border border-border bg-highlight px-5 py-4 disabled:opacity-40"
               >
-                <Text className="font-medium text-primary-foreground">Summary</Text>
+                <Text className="font-medium text-primary">Summary</Text>
               </Pressable>
             </Link>
             <Link
@@ -119,9 +118,9 @@ const StudySetDetailScreen = () => {
               asChild
               disabled={!hasReadySources}
             >
-              <Pressable disabled={!hasReadySources} className="rounded-xl bg-primary px-4 py-3 disabled:opacity-40"><Text className="font-medium text-primary-foreground">Flashcards</Text></Pressable>
+              <Pressable disabled={!hasReadySources} className="min-h-20 grow justify-center rounded-2xl border border-border bg-highlight px-5 py-4 disabled:opacity-40"><Text className="font-medium text-primary">Flashcards</Text></Pressable>
             </Link>
-            <Link href={`${basePath}/chat` as Href} asChild disabled={!hasReadySources}><Pressable disabled={!hasReadySources} className="rounded-xl bg-primary px-4 py-3 disabled:opacity-40"><Text className="font-medium text-primary-foreground">Study chat</Text></Pressable></Link>
+            <Link href={`${basePath}/chat` as Href} asChild disabled={!hasReadySources}><Pressable disabled={!hasReadySources} className="min-h-20 grow justify-center rounded-2xl border border-border bg-highlight px-5 py-4 disabled:opacity-40"><Text className="font-medium text-primary">Study chat</Text></Pressable></Link>
         
              
           </View>
@@ -134,10 +133,10 @@ const StudySetDetailScreen = () => {
             <Pressable
               disabled={uploadMutation.isPending}
               onPress={() => uploadMutation.mutate()}
-              className="min-w-[30%] flex-1 items-center rounded-xl bg-primary px-4 py-3 disabled:opacity-50"
+              className="min-w-[30%] flex-1 items-center rounded-2xl bg-primary px-5 py-4 disabled:opacity-50"
             >
               {uploadMutation.isPending ? (
-                <ActivityIndicator color="#101010" />
+                <ActivityIndicator color="#000000" />
               ) : (
                 <Text className="font-medium text-primary-foreground">Upload PDF</Text>
               )}
@@ -146,7 +145,7 @@ const StudySetDetailScreen = () => {
               onPress={() =>
                 setSourceForm((v) => (v === "note" ? null : "note"))
               }
-              className="min-w-[30%] flex-1 items-center rounded-xl border border-border bg-card px-4 py-3"
+              className="min-w-[30%] flex-1 items-center rounded-2xl border border-border bg-card px-4 py-3"
             >
               <Text className="font-medium text-foreground">Add note</Text>
             </Pressable>
@@ -154,28 +153,28 @@ const StudySetDetailScreen = () => {
               onPress={() =>
                 setSourceForm((v) => (v === "web" ? null : "web"))
               }
-              className="min-w-[30%] flex-1 items-center rounded-xl border border-border bg-card px-4 py-3"
+              className="min-w-[30%] flex-1 items-center rounded-2xl border border-border bg-card px-4 py-3"
             >
               <Text className="font-medium text-foreground">Add URL</Text>
             </Pressable>
           </View>
 
           {sourceForm === "note" ? (
-            <View className="gap-3 rounded-2xl border border-border bg-card p-4">
+            <View className="gap-3 rounded-3xl border border-border bg-card p-5">
               <TextInput
                 placeholder="Note title"
-                placeholderTextColor="#71717a"
+                placeholderTextColor="#B3A58E"
                 value={noteTitle}
                 onChangeText={setNoteTitle}
-                className="rounded-xl border border-border bg-input px-4 py-3 text-foreground"
+                className="rounded-2xl border border-border bg-input px-4 py-4 text-foreground"
               />
               <TextInput
                 placeholder="Paste your notes here..."
-                placeholderTextColor="#71717a"
+                placeholderTextColor="#B3A58E"
                 value={noteContent}
                 onChangeText={setNoteContent}
                 multiline
-                className="min-h-32 rounded-xl border border-border bg-input px-4 py-3 text-foreground"
+                className="min-h-32 rounded-2xl border border-border bg-input px-4 py-4 text-foreground"
               />
               <Pressable
                 disabled={
@@ -184,10 +183,10 @@ const StudySetDetailScreen = () => {
                   noteMutation.isPending
                 }
                 onPress={() => noteMutation.mutate()}
-                className="items-center rounded-xl bg-primary px-4 py-3 disabled:opacity-50"
+                className="items-center rounded-2xl bg-primary px-5 py-4 disabled:opacity-50"
               >
                 {noteMutation.isPending ? (
-                  <ActivityIndicator color="#101010" />
+                  <ActivityIndicator color="#000000" />
                 ) : (
                   <Text className="font-semibold text-primary-foreground">
                     Save & process
@@ -198,31 +197,31 @@ const StudySetDetailScreen = () => {
           ) : null}
 
           {sourceForm === "web" ? (
-            <View className="gap-3 rounded-2xl border border-border bg-card p-4">
+            <View className="gap-3 rounded-3xl border border-border bg-card p-5">
               <TextInput
                 placeholder="https://example.com/article"
-                placeholderTextColor="#71717a"
+                placeholderTextColor="#B3A58E"
                 value={webUrl}
                 onChangeText={setWebUrl}
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="url"
-                className="rounded-xl border border-border bg-input px-4 py-3 text-foreground"
+                className="rounded-2xl border border-border bg-input px-4 py-4 text-foreground"
               />
               <TextInput
                 placeholder="Title (optional)"
-                placeholderTextColor="#71717a"
+                placeholderTextColor="#B3A58E"
                 value={webTitle}
                 onChangeText={setWebTitle}
-                className="rounded-xl border border-border bg-input px-4 py-3 text-foreground"
+                className="rounded-2xl border border-border bg-input px-4 py-4 text-foreground"
               />
               <Pressable
                 disabled={!webUrl.trim() || webMutation.isPending}
                 onPress={() => webMutation.mutate()}
-                className="items-center rounded-xl bg-primary px-4 py-3 disabled:opacity-50"
+                className="items-center rounded-2xl bg-primary px-5 py-4 disabled:opacity-50"
               >
                 {webMutation.isPending ? (
-                  <ActivityIndicator color="#101010" />
+                  <ActivityIndicator color="#000000" />
                 ) : (
                   <Text className="font-semibold text-primary-foreground">
                     Save & process

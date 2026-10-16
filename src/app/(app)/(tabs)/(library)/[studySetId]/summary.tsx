@@ -1,3 +1,4 @@
+import { ScreenHeading } from "@/components/screen-heading";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { ScrollView, Text, View } from "react-native";
@@ -13,8 +14,8 @@ export default function SummaryScreen() {
   const sources = useSources(studySetId);
   const ready = sources.data?.some(source => source.status === "ready");
   const generate = useMutation({ mutationFn: () => generateSummary(studySetId), onSuccess: () => client.invalidateQueries({ queryKey: studySetKeys.summary(studySetId) }) });
-  return <><Stack.Screen options={{ title: "Summary" }} /><ScrollView className="flex-1 bg-background" contentContainerClassName="gap-5 p-6 pb-12" contentInsetAdjustmentBehavior="automatic">
-    <View className="gap-2"><Text className="text-2xl font-bold text-foreground">The big picture</Text><Text className="text-base leading-6 text-muted">Turn your sources into a focused guide to the key ideas.</Text></View>
+  return <><Stack.Screen options={{ title: "Summary" }} /><ScrollView className="flex-1 bg-background" contentContainerClassName="gap-6 px-5 py-6 pb-12" contentInsetAdjustmentBehavior="automatic">
+    <ScreenHeading eyebrow="READ & UNDERSTAND" title="The big picture" description="Turn your sources into a focused guide to the key ideas." />
     <QueryFeedback loading={summary.isLoading} error={summary.error || sources.error} onRetry={() => { void summary.refetch(); void sources.refetch(); }} />
     {!summary.isLoading && !summary.error && !summary.data ? <EmptyState title="Your summary starts here" description={ready ? "Generate a guide from your processed sources." : "Add and process a source in your study set first."} /> : null}
     {summary.data ? <View className="gap-4 rounded-2xl border border-border bg-card p-5"><Text className="text-xs text-muted">Generated {new Date(summary.data.created_at).toLocaleDateString()}</Text><StudyText content={summary.data.content} /></View> : null}
