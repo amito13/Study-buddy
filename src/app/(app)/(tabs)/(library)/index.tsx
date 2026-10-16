@@ -38,7 +38,7 @@ export default function LibraryScreen() {
 
   const listHeader = (
     <View className="gap-4 pb-4">
-      <ScreenHeading eyebrow="YOUR PERSONAL STUDY SPACE" title={"Small steps.\nBig breakthroughs."} description="Gather your materials. Find the key ideas. Make what you learn stay with you." />
+      <ScreenHeading introduction eyebrow="MAKE ROOM FOR YOUR NEXT IDEA" title={"A curious mind.\nA world to discover."} description="Gather your materials. Find the key ideas. Make what you learn stay with you." />
       <View className="flex-row items-center justify-between pt-3">
         <Text className="text-xl font-semibold text-foreground">Your collections</Text>
         <Text className="text-sm text-muted">{studySets?.length ?? 0} study sets</Text>
@@ -90,9 +90,10 @@ export default function LibraryScreen() {
       ) : (
         <Pressable
           onPress={() => setShowForm(true)}
-          className="items-center rounded-2xl bg-primary px-5 py-4"
+          className="flex-row items-center justify-between rounded-2xl bg-primary px-5 py-5"
         >
-          <Text className="font-semibold text-primary-foreground">＋  New study set</Text>
+          <Text className="text-base font-bold text-primary-foreground">Start a new collection</Text>
+          <Text className="text-2xl text-primary-foreground">＋</Text>
         </Pressable>
       )}
     </View>
@@ -116,7 +117,7 @@ export default function LibraryScreen() {
           description="Create your first study set, then add a PDF or note to get started."
         />
       }
-      renderItem={({ item }) => <StudySetCard studySet={item} />}
+      renderItem={({ item, index }) => <StudySetCard studySet={item} index={index} />}
     />
   );
 }

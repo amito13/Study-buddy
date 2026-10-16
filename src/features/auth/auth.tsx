@@ -128,16 +128,16 @@ export function AuthScreen({ mode }: AuthScreenProps) {
       <ScrollView
         className="flex-1 bg-background"
         style={{ flex: 1, backgroundColor: BACKGROUND }}
-        contentContainerClassName="grow px-6 gap-8"
+        contentContainerClassName="grow px-5 gap-6"
         contentContainerStyle={{
-          paddingTop: insets.top + 48,
+          paddingTop: insets.top + 24,
           paddingBottom: insets.bottom + 48,
         }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior="automatic"
       >
-        <ScreenHeading eyebrow="STUDY BUDDY" title={isLogin ? "Welcome back.\nFind your focus." : "A fresh start.\nA clearer mind."} description="Your notes, connected. Your ideas, understood. A calmer way to learn." />
+        <ScreenHeading introduction eyebrow="STUDY BUDDY" title={isLogin ? "Welcome back.\nFind your focus." : "A fresh start.\nA clearer mind."} description="Your notes, connected. Your ideas, understood. A calmer way to learn." />
         <Text className="text-xl font-semibold text-foreground">{subtitle}</Text>
 
         {/* Email + password + submit */}

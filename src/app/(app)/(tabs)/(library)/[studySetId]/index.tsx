@@ -108,9 +108,9 @@ const StudySetDetailScreen = () => {
             >
               <Pressable
                 disabled={!hasReadySources}
-                className="min-h-20 grow justify-center rounded-2xl border border-border bg-highlight px-5 py-4 disabled:opacity-40"
+                className="min-h-32 min-w-[45%] flex-1 justify-between gap-4 rounded-3xl border border-border bg-highlight px-5 py-5 disabled:opacity-40"
               >
-                <Text className="font-medium text-primary">Summary</Text>
+                <Text className="text-2xl text-primary">≋</Text><View className="gap-1"><Text className="text-lg font-semibold text-primary">Summary</Text><Text className="text-xs text-muted">See the big picture</Text></View>
               </Pressable>
             </Link>
             <Link
@@ -118,9 +118,9 @@ const StudySetDetailScreen = () => {
               asChild
               disabled={!hasReadySources}
             >
-              <Pressable disabled={!hasReadySources} className="min-h-20 grow justify-center rounded-2xl border border-border bg-highlight px-5 py-4 disabled:opacity-40"><Text className="font-medium text-primary">Flashcards</Text></Pressable>
+              <Pressable disabled={!hasReadySources} className="min-h-32 min-w-[45%] flex-1 justify-between gap-4 rounded-3xl border border-border bg-highlight px-5 py-5 disabled:opacity-40"><Text className="text-2xl text-primary">▤</Text><View className="gap-1"><Text className="text-lg font-semibold text-primary">Flashcards</Text><Text className="text-xs text-muted">Make the ideas stick</Text></View></Pressable>
             </Link>
-            <Link href={`${basePath}/chat` as Href} asChild disabled={!hasReadySources}><Pressable disabled={!hasReadySources} className="min-h-20 grow justify-center rounded-2xl border border-border bg-highlight px-5 py-4 disabled:opacity-40"><Text className="font-medium text-primary">Study chat</Text></Pressable></Link>
+            <Link href={`${basePath}/chat` as Href} asChild disabled={!hasReadySources}><Pressable disabled={!hasReadySources} className="min-h-32 min-w-[45%] flex-1 justify-between gap-4 rounded-3xl border border-border bg-highlight px-5 py-5 disabled:opacity-40"><Text className="text-2xl text-primary">✦</Text><View className="gap-1"><Text className="text-lg font-semibold text-primary">Study chat</Text><Text className="text-xs text-muted">Follow your curiosity</Text></View></Pressable></Link>
         
              
           </View>
